@@ -15,10 +15,15 @@ export default function OrderDashboard() {
   const categories = ['All', ...new Set(menus.map(item => item.category))];
   const filteredMenu = activeCategory === 'All' ? menus : menus.filter(m => m.category === activeCategory);
 
+  const MAX_QUANTITY = 200;
+
   const addToCart = (item) => {
     setCart(prev => {
       const existing = prev.find(p => p.id === item.id);
-      if (existing) return prev.map(p => p.id === item.id ? { ...p, quantity: p.quantity + 1 } : p);
+      if (existing) {
+        if (existing.quantity >= MAX_QUANTITY) return prev;
+        return prev.map(p => p.id === item.id ? { ...p, quantity: p.quantity + 1 } : p);
+      }
       return [...prev, { ...item, quantity: 1 }];
     });
   };
@@ -39,6 +44,7 @@ export default function OrderDashboard() {
 
   const submitOrder = () => {
     if (!tableNumber) return alert('Please enter a table number');
+    if (Number(tableNumber) < 1 || Number(tableNumber) > 20) return alert('Table number must be between 1 and 20');
     if (cart.length === 0) return alert('Cart is empty');
 
     setIsSubmitting(true);
@@ -160,8 +166,11 @@ export default function OrderDashboard() {
             <div className="relative">
               <Navigation className="absolute left-4 top-3.5 text-brand-orange-500" size={18} />
               <input
-                type="number" min="1" placeholder="Enter table number..." value={tableNumber}
-                onChange={(e) => setTableNumber(e.target.value)}
+                type="number" min="1" max="20" placeholder="Enter table number (1–20)..." value={tableNumber}
+                onChange={(e) => {
+                  const val = e.target.value === '' ? '' : String(Math.min(20, Math.max(1, Number(e.target.value))));
+                  setTableNumber(val);
+                }}
                 className="w-full bg-white/5 border border-white/20 rounded-xl pl-11 pr-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-orange-500 focus:border-brand-orange-500 transition-all font-medium"
               />
             </div>
