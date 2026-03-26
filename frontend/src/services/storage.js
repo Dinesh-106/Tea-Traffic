@@ -5,29 +5,31 @@
 const ORDERS_KEY = 'tt_orders';
 
 // Hard-coded staff credentials (for prototype)
-const USERS = [
-  { email: 'employee@teatraffic.com', password: 'pwd', role: 'OrderStaff' },
-  { email: 'chef@teatraffic.com',     password: 'pwd', role: 'Chef',         staticCode: 'cheff@12' },
-  { email: 'bill@teatraffic.com',     password: 'pwd', role: 'BillingStaff', staticCode: 'bill@12'  },
-];
+const STAFF_CODES = {
+  Chef:         'cheff@12',
+  BillingStaff: 'bill@12',
+};
+
+const ORDER_STAFF = { email: 'employee@teatraffic.com', password: 'pwd' };
 
 // ── Auth ──────────────────────────────────────────────────────────────────
 
 export function login({ email, password, role, staticCode }) {
-  const user = USERS.find(u => u.email === email && u.role === role);
+  if (role === 'OrderStaff') {
+    if (email !== ORDER_STAFF.email || password !== ORDER_STAFF.password)
+      throw new Error('Invalid credentials');
+  } else {
+    // Chef / BillingStaff — auth code only, no email/password needed
+    if (!staticCode || staticCode !== STAFF_CODES[role])
+      throw new Error('Invalid authorization code');
+  }
 
-  if (!user) throw new Error('User not found for this role');
-  if (user.password !== password) throw new Error('Invalid credentials');
-  if (user.staticCode && user.staticCode !== staticCode)
-    throw new Error('Invalid authorization code');
-
-  // Store session
-  const token = btoa(`${email}:${role}:${Date.now()}`); // simple fake token
+  const token = btoa(`${role}:${Date.now()}`);
   localStorage.setItem('token', token);
   localStorage.setItem('role', role);
-  localStorage.setItem('email', email);
+  localStorage.setItem('email', email || role);
 
-  return { token, role, email };
+  return { token, role, email: email || role };
 }
 
 export function logout() {

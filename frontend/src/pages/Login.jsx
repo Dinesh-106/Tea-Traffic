@@ -12,27 +12,22 @@ export default function Login() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
+  const isStaffRole = role === 'Chef' || role === 'BillingStaff';
+
   const handleLogin = (e) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
-
     try {
-      const response = login({
-        email,
-        password,
-        role,
-        ...(role !== 'OrderStaff' && { staticCode })
-      });
-
+      const response = login({ email, password, role, staticCode });
       switch (response.role) {
-        case 'OrderStaff':  navigate('/');        break;
-        case 'Chef':        navigate('/chef');     break;
-        case 'BillingStaff':navigate('/billing'); break;
-        default:            navigate('/');
+        case 'OrderStaff':   navigate('/');        break;
+        case 'Chef':         navigate('/chef');     break;
+        case 'BillingStaff': navigate('/billing');  break;
+        default:             navigate('/');
       }
     } catch (err) {
-      setError(err.message || 'Invalid login credentials');
+      setError(err.message || 'Invalid credentials');
     } finally {
       setIsLoading(false);
     }
@@ -51,91 +46,94 @@ export default function Login() {
           <p className="text-orange-100 text-sm mt-1">Staff Portal Login</p>
         </div>
 
-        <form onSubmit={handleLogin} className="p-8 space-y-6">
+        <form onSubmit={handleLogin} className="p-8 space-y-5">
           {error && (
             <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm flex items-start gap-2 border border-red-100">
-              <span className="font-semibold block shrink-0 mt-0.5">!</span>
+              <span className="font-semibold shrink-0 mt-0.5">!</span>
               <span>{error}</span>
             </div>
           )}
 
-          <div className="space-y-4">
+          {/* Role selector */}
+          <div>
+            <label className="text-sm font-medium text-gray-700 mb-1 block">Staff Role</label>
             <div className="relative">
-              <label className="text-sm font-medium text-gray-700 mb-1 block">Staff Role</label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                  <UserCircle2 size={18} />
-                </div>
-                <select
-                  value={role}
-                  onChange={(e) => { setRole(e.target.value); setStaticCode(''); setError(''); }}
-                  className="w-full pl-10 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white transition-all text-sm appearance-none"
-                >
-                  <option value="OrderStaff">Order Staff</option>
-                  <option value="Chef">Chef</option>
-                  <option value="BillingStaff">Billing Staff</option>
-                </select>
-                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-gray-400">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-                  </svg>
-                </div>
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                <UserCircle2 size={18} />
+              </div>
+              <select
+                value={role}
+                onChange={(e) => { setRole(e.target.value); setStaticCode(''); setEmail(''); setPassword(''); setError(''); }}
+                className="w-full pl-10 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white transition-all text-sm appearance-none"
+              >
+                <option value="OrderStaff">Order Staff</option>
+                <option value="Chef">Chef</option>
+                <option value="BillingStaff">Billing Staff</option>
+              </select>
+              <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-gray-400">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                </svg>
               </div>
             </div>
+          </div>
 
-            {(role === 'Chef' || role === 'BillingStaff') && (
-              <div className="relative fade-in">
-                <label className="text-sm font-medium text-gray-700 mb-1 block">Authorization Code</label>
+          {/* Chef / BillingStaff — auth code only */}
+          {isStaffRole ? (
+            <div className="fade-in">
+              <label className="text-sm font-medium text-gray-700 mb-1 block">Authorization Code</label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                  <KeyRound size={18} />
+                </div>
+                <input
+                  type="password"
+                  placeholder="Enter authorization code"
+                  value={staticCode}
+                  onChange={(e) => setStaticCode(e.target.value)}
+                  required
+                  className="w-full pl-10 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white transition-all text-sm"
+                />
+              </div>
+              <p className="text-xs text-gray-400 mt-1.5">Enter your unique staff authorization code</p>
+            </div>
+          ) : (
+            /* Order Staff — email + password */
+            <>
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">Email Address</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                    <KeyRound size={18} />
+                    <Mail size={18} />
                   </div>
                   <input
-                    type="password"
-                    placeholder="Enter strictly authorized code"
-                    value={staticCode}
-                    onChange={(e) => setStaticCode(e.target.value)}
+                    type="email"
+                    placeholder="employee@teatraffic.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     required
                     className="w-full pl-10 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white transition-all text-sm"
                   />
                 </div>
               </div>
-            )}
-
-            <div className="relative">
-              <label className="text-sm font-medium text-gray-700 mb-1 block">Email Address</label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                  <Mail size={18} />
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">Password</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                    <Lock size={18} />
+                  </div>
+                  <input
+                    type="password"
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    className="w-full pl-10 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white transition-all text-sm"
+                  />
                 </div>
-                <input
-                  type="email"
-                  placeholder="employee@teatraffic.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  className="w-full pl-10 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white transition-all text-sm"
-                />
               </div>
-            </div>
-
-            <div className="relative">
-              <label className="text-sm font-medium text-gray-700 mb-1 block">Password</label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                  <Lock size={18} />
-                </div>
-                <input
-                  type="password"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  className="w-full pl-10 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white transition-all text-sm"
-                />
-              </div>
-            </div>
-          </div>
+            </>
+          )}
 
           <button
             type="submit"
@@ -145,17 +143,13 @@ export default function Login() {
             {isLoading ? (
               <span className="flex items-center gap-2">
                 <svg className="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                 </svg>
                 Authenticating...
               </span>
             ) : 'Sign In'}
           </button>
-
-          <p className="text-center text-xs text-gray-400 pt-2">
-            Demo credentials: <span className="font-mono text-gray-600">employee@teatraffic.com / pwd</span>
-          </p>
         </form>
       </div>
     </div>

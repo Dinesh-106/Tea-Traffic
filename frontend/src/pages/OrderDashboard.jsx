@@ -71,11 +71,10 @@ export default function OrderDashboard() {
               <button
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
-                className={`snap-start px-5 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap transition-all duration-300 ${
-                  activeCategory === cat
+                className={`snap-start px-5 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap transition-all duration-300 ${activeCategory === cat
                     ? 'bg-gradient-to-r from-brand-orange-500 to-amber-500 text-white shadow-[0_4px_15px_rgba(249,115,22,0.4)] transform scale-105'
                     : 'bg-white/10 text-gray-300 hover:bg-white/20 border border-white/5 hover:text-white'
-                }`}
+                  }`}
               >
                 {cat}
               </button>
