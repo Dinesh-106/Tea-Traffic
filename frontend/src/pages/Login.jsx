@@ -95,7 +95,6 @@ export default function Login() {
                   className="w-full pl-10 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white transition-all text-sm"
                 />
               </div>
-              <p className="text-xs text-gray-400 mt-1.5">Enter your unique staff authorization code</p>
             </div>
           ) : (
             /* Order Staff — email + password */
