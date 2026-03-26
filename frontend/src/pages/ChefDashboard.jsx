@@ -1,36 +1,30 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import { ChefHat, CheckSquare, XSquare, Clock } from 'lucide-react';
+import { getOrders, updateOrderStatus } from '../services/storage';
 
 export default function ChefDashboard() {
   const [orders, setOrders] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const fetchOrders = async () => {
-    try {
-      const res = await axios.get('http://localhost:5000/api/orders?status=Pending');
-      setOrders(res.data);
-    } catch (err) {
-      console.error('Failed to fetch pending orders', err);
-    } finally {
-      setIsLoading(false);
-    }
+  const fetchOrders = () => {
+    setOrders(getOrders('Pending'));
+    setIsLoading(false);
   };
 
   useEffect(() => {
     fetchOrders();
-    const interval = setInterval(fetchOrders, 5000);
+    const interval = setInterval(fetchOrders, 3000);
     return () => clearInterval(interval);
   }, []);
 
-  const updateStatus = async (id, status) => {
+  const updateStatus = (id, status) => {
     try {
-      await axios.patch(`http://localhost:5000/api/orders/${id}/status`, { status });
+      updateOrderStatus(id, status);
       if (status === 'Rejected') {
         alert('Order Rejected. Order Staff will be notified implicitly (via status).');
       }
       setOrders(orders.filter(o => o._id !== id));
-    } catch (err) {
+    } catch {
       alert('Failed to update status');
     }
   };
@@ -45,7 +39,7 @@ export default function ChefDashboard() {
           Chef Dashboard
         </h2>
         <div className="flex items-center gap-2 text-sm text-gray-200 bg-black/40 backdrop-blur-xl px-5 py-2.5 rounded-full shadow-2xl border border-white/10">
-          <Clock size={16} className="text-brand-orange-400 animate-pulse" /> Auto-updating every 5s
+          <Clock size={16} className="text-brand-orange-400 animate-pulse" /> Auto-updating every 3s
         </div>
       </div>
 
@@ -64,7 +58,7 @@ export default function ChefDashboard() {
           {orders.map(order => (
             <div key={order._id} className="bg-black/40 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl hover:bg-black/50 transition-all duration-300 relative flex flex-col overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand-orange-500 to-yellow-500"></div>
-              
+
               <div className="p-6 border-b border-white/10 flex justify-between items-center bg-white/5">
                 <div className="flex items-center gap-3">
                   <span className="bg-brand-orange-500 text-white text-sm font-black px-3 py-1.5 rounded-lg shadow-md">
@@ -77,7 +71,7 @@ export default function ChefDashboard() {
                   Pending
                 </span>
               </div>
-              
+
               <div className="p-6 flex-1 overflow-y-auto">
                 <ul className="space-y-4">
                   {order.items.map((item, idx) => (
@@ -85,22 +79,20 @@ export default function ChefDashboard() {
                       <span className="bg-white/10 text-white w-8 h-8 flex text-center justify-center items-center rounded-lg font-bold border border-white/5 shadow-inner flex-shrink-0">
                         {item.quantity}
                       </span>
-                      <span className="font-medium text-gray-200 mt-1 leading-tight">
-                        {item.name}
-                      </span>
+                      <span className="font-medium text-gray-200 mt-1 leading-tight">{item.name}</span>
                     </li>
                   ))}
                 </ul>
               </div>
 
               <div className="p-5 border-t border-white/10 bg-black/60 grid grid-cols-2 gap-4 rounded-b-3xl">
-                <button 
+                <button
                   onClick={() => updateStatus(order._id, 'Accepted')}
                   className="flex items-center justify-center gap-2 py-3 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-xl font-bold hover:bg-emerald-500 hover:text-white transition-all shadow-lg text-sm group"
                 >
                   <CheckSquare size={18} className="group-hover:scale-110 transition-transform" /> Accept
                 </button>
-                <button 
+                <button
                   onClick={() => updateStatus(order._id, 'Rejected')}
                   className="flex items-center justify-center gap-2 py-3 bg-red-500/10 text-red-400 border border-red-500/20 rounded-xl font-bold hover:bg-red-500 hover:text-white transition-all shadow-lg text-sm group"
                 >

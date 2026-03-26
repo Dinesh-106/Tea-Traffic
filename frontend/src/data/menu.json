@@ -1,0 +1,9 @@
+[
+  { "id": "1", "name": "Masala Tea",      "category": "Tea",          "price": 20,  "available": true },
+  { "id": "2", "name": "Cold Coffee",     "category": "Coffee",       "price": 50,  "available": true },
+  { "id": "3", "name": "Samosa",          "category": "Snacks",       "price": 15,  "available": true },
+  { "id": "4", "name": "Paneer Tikka",    "category": "Veg Food",     "price": 150, "available": true },
+  { "id": "5", "name": "Chicken Biryani", "category": "Non-Veg Food", "price": 250, "available": true },
+  { "id": "6", "name": "Oreo Shake",      "category": "Shakes",       "price": 90,  "available": true },
+  { "id": "7", "name": "Lemon Soda",      "category": "Drinks",       "price": 40,  "available": true }
+]

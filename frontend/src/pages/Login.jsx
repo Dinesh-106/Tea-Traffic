@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { login } from '../services/storage';
 import { Coffee, Lock, Mail, UserCircle2, KeyRound } from 'lucide-react';
 
 export default function Login() {
@@ -12,40 +12,27 @@ export default function Login() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = async (e) => {
+  const handleLogin = (e) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
 
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/login', {
+      const response = login({
         email,
         password,
         role,
         ...(role !== 'OrderStaff' && { staticCode })
       });
 
-      if (response.data.token) {
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('role', response.data.role);
-        localStorage.setItem('email', response.data.email);
-
-        switch (response.data.role) {
-          case 'OrderStaff':
-            navigate('/order');
-            break;
-          case 'Chef':
-            navigate('/chef');
-            break;
-          case 'BillingStaff':
-            navigate('/billing');
-            break;
-          default:
-            navigate('/');
-        }
+      switch (response.role) {
+        case 'OrderStaff':  navigate('/');        break;
+        case 'Chef':        navigate('/chef');     break;
+        case 'BillingStaff':navigate('/billing'); break;
+        default:            navigate('/');
       }
     } catch (err) {
-      setError(err.response?.data?.message || 'Invalid login credentials');
+      setError(err.message || 'Invalid login credentials');
     } finally {
       setIsLoading(false);
     }
@@ -81,11 +68,7 @@ export default function Login() {
                 </div>
                 <select
                   value={role}
-                  onChange={(e) => {
-                    setRole(e.target.value);
-                    setStaticCode('');
-                    setError('');
-                  }}
+                  onChange={(e) => { setRole(e.target.value); setStaticCode(''); setError(''); }}
                   className="w-full pl-10 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white transition-all text-sm appearance-none"
                 >
                   <option value="OrderStaff">Order Staff</option>
@@ -167,10 +150,12 @@ export default function Login() {
                 </svg>
                 Authenticating...
               </span>
-            ) : (
-              'Sign In'
-            )}
+            ) : 'Sign In'}
           </button>
+
+          <p className="text-center text-xs text-gray-400 pt-2">
+            Demo credentials: <span className="font-mono text-gray-600">employee@teatraffic.com / pwd</span>
+          </p>
         </form>
       </div>
     </div>

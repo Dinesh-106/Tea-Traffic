@@ -1,34 +1,28 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import { ReceiptCent, CheckCircle2, Clock } from 'lucide-react';
+import { getOrders, updateOrderStatus } from '../services/storage';
 
 export default function BillingDashboard() {
   const [orders, setOrders] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const fetchOrders = async () => {
-    try {
-      const res = await axios.get('http://localhost:5000/api/orders?status=Accepted');
-      setOrders(res.data);
-    } catch (err) {
-      console.error('Failed to fetch accepted orders', err);
-    } finally {
-      setIsLoading(false);
-    }
+  const fetchOrders = () => {
+    setOrders(getOrders('Accepted'));
+    setIsLoading(false);
   };
 
   useEffect(() => {
     fetchOrders();
-    const interval = setInterval(fetchOrders, 5000);
+    const interval = setInterval(fetchOrders, 3000);
     return () => clearInterval(interval);
   }, []);
 
-  const finalizeBill = async (id) => {
+  const finalizeBill = (id) => {
     try {
-      await axios.patch(`http://localhost:5000/api/orders/${id}/status`, { status: 'Billed' });
+      updateOrderStatus(id, 'Billed');
       setOrders(orders.filter(o => o._id !== id));
       alert('Order billed successfully and removed from active list.');
-    } catch (err) {
+    } catch {
       alert('Failed to finalize bill');
     }
   };
@@ -43,7 +37,7 @@ export default function BillingDashboard() {
           Billing Center
         </h2>
         <div className="flex items-center gap-2 text-sm text-gray-200 bg-black/40 backdrop-blur-xl px-5 py-2.5 rounded-full shadow-2xl border border-white/10">
-          <Clock size={16} className="text-emerald-400 animate-pulse" /> Auto-updating every 5s
+          <Clock size={16} className="text-emerald-400 animate-pulse" /> Auto-updating every 3s
         </div>
       </div>
 
@@ -62,7 +56,7 @@ export default function BillingDashboard() {
           {orders.map(order => (
             <div key={order._id} className="bg-black/40 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl hover:bg-black/50 transition-all duration-300 relative overflow-hidden flex flex-col group">
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-600 to-emerald-400"></div>
-              
+
               <div className="p-6 border-b border-white/10 flex justify-between items-start">
                 <div>
                   <h3 className="text-2xl font-bold text-white mb-1">Table {order.tableNumber}</h3>
