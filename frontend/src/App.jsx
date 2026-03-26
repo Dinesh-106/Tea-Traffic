@@ -19,10 +19,7 @@ function ProtectedRoute({ children, allowedRoles }) {
 
 function App() {
   return (
-    <div 
-      className="min-h-screen flex flex-col font-sans text-gray-900 bg-fixed bg-center bg-cover"
-      style={{ backgroundImage: "linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('/img/logo.png')" }}
-    >
+    <div className="min-h-screen flex flex-col font-sans text-gray-200 bg-black">
       <Navbar />
       <main className="flex-1 w-full max-w-7xl mx-auto p-4 md:p-6 fade-in h-full flex flex-col">
         <Routes>
