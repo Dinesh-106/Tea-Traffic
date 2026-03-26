@@ -214,13 +214,28 @@ export default function OrderDashboard() {
               <span className="text-gray-400 font-semibold text-sm uppercase tracking-widest">Total Cost</span>
               <span className="text-4xl font-black text-white drop-shadow-[0_2px_10px_rgba(255,255,255,0.2)]">₹{totalCost}</span>
             </div>
-            <button
-              onClick={submitOrder}
-              disabled={cart.length === 0 || isSubmitting || !tableNumber}
-              className="w-full py-4 bg-gradient-to-r from-brand-orange-500 to-amber-500 text-white rounded-xl font-bold text-base shadow-[0_0_20px_rgba(249,115,22,0.4)] hover:shadow-[0_0_30px_rgba(249,115,22,0.6)] disabled:opacity-50 disabled:shadow-none hover:-translate-y-1 active:scale-95 transition-all flex items-center justify-center gap-2"
-            >
-              {isSubmitting ? 'Routing to Kitchen...' : 'Send Order to Kitchen'} {!isSubmitting && <Send size={18} />}
-            </button>
+            <div className="flex gap-4">
+              <button
+                onClick={() => {
+                  if (window.confirm('Are you sure you want to cancel this order?')) {
+                    setCart([]);
+                    setTableNumber('');
+                    setIsCartOpen(false);
+                  }
+                }}
+                disabled={cart.length === 0}
+                className="w-1/3 py-4 bg-red-500/10 text-red-500 border border-red-500/30 rounded-xl font-bold text-base hover:bg-red-500 hover:text-white disabled:opacity-50 disabled:border-white/10 disabled:text-gray-500 hover:-translate-y-1 active:scale-95 transition-all"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={submitOrder}
+                disabled={cart.length === 0 || isSubmitting || !tableNumber}
+                className="flex-1 py-4 bg-gradient-to-r from-brand-orange-500 to-amber-500 text-white rounded-xl font-bold text-base shadow-[0_0_20px_rgba(249,115,22,0.4)] hover:shadow-[0_0_30px_rgba(249,115,22,0.6)] disabled:opacity-50 disabled:shadow-none hover:-translate-y-1 active:scale-95 transition-all flex items-center justify-center gap-2"
+              >
+                {isSubmitting ? 'Routing...' : 'Send Order'} {!isSubmitting && <Send size={18} />}
+              </button>
+            </div>
           </div>
         </div>
       </div>
