@@ -11,8 +11,6 @@ export default function Navbar() {
 
   const [showLogin, setShowLogin] = useState(false);
   const [loginRole, setLoginRole] = useState('Chef');
-  const [loginEmail, setLoginEmail] = useState('');
-  const [loginPassword, setLoginPassword] = useState('');
   const [loginStaticCode, setLoginStaticCode] = useState('');
   const [loginError, setLoginError] = useState('');
   const [isLoggingIn, setIsLoggingIn] = useState(false);
@@ -31,8 +29,6 @@ export default function Navbar() {
 
     try {
       const response = login({
-        email: loginEmail,
-        password: loginPassword,
         role: loginRole,
         staticCode: loginStaticCode
       });
@@ -93,11 +89,7 @@ export default function Navbar() {
                     <Lock size={16} className="text-brand-orange-500" /> Staff Login
                   </h3>
                   <div className="flex bg-black/40 p-1 rounded-lg border border-white/5">
-                    <button 
-                      onClick={() => { setLoginRole('OrderStaff'); setLoginError(''); setLoginEmail(''); setLoginPassword(''); }} 
-                      type="button"
-                      className={`text-[11px] px-2 py-1 rounded-md font-medium transition-colors ${loginRole === 'OrderStaff' ? 'bg-brand-orange-500 text-white shadow-sm' : 'text-gray-400 hover:text-white'}`}
-                    >Order Staff</button>
+
                     <button 
                       onClick={() => { setLoginRole('Chef'); setLoginError(''); setLoginStaticCode(''); }} 
                       type="button"
@@ -114,32 +106,13 @@ export default function Navbar() {
                 <form onSubmit={handleAuth} className="space-y-3">
                   {loginError && <div className="text-red-400 text-xs bg-red-400/10 p-2 rounded border border-red-400/20">{loginError}</div>}
                   
-                  {loginRole === 'Chef' || loginRole === 'BillingStaff' ? (
-                    <div className="relative fade-in">
-                      <KeyRound size={14} className="absolute left-3 top-2.5 text-brand-orange-500" />
-                      <input 
-                        type="password" placeholder="Auth Code" required value={loginStaticCode} onChange={e => setLoginStaticCode(e.target.value)}
-                        className="w-full pl-9 pr-3 py-2 text-sm bg-black/50 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-brand-orange-500 focus:border-brand-orange-500 focus:outline-none placeholder-gray-500 font-medium transition-colors"
-                      />
-                    </div>
-                  ) : (
-                    <div className="space-y-3 fade-in">
-                      <div className="relative">
-                        <Mail size={14} className="absolute left-3 top-2.5 text-brand-orange-500" />
-                        <input 
-                          type="email" placeholder="Email" required value={loginEmail} onChange={e => setLoginEmail(e.target.value)}
-                          className="w-full pl-9 pr-3 py-2 text-sm bg-black/50 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-brand-orange-500 focus:border-brand-orange-500 focus:outline-none placeholder-gray-500 font-medium transition-colors"
-                        />
-                      </div>
-                      <div className="relative">
-                        <Lock size={14} className="absolute left-3 top-2.5 text-brand-orange-500" />
-                        <input 
-                          type="password" placeholder="Password" required value={loginPassword} onChange={e => setLoginPassword(e.target.value)}
-                          className="w-full pl-9 pr-3 py-2 text-sm bg-black/50 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-brand-orange-500 focus:border-brand-orange-500 focus:outline-none placeholder-gray-500 font-medium transition-colors"
-                        />
-                      </div>
-                    </div>
-                  )}
+                  <div className="relative fade-in">
+                    <KeyRound size={14} className="absolute left-3 top-2.5 text-brand-orange-500" />
+                    <input 
+                      type="password" placeholder="Auth Code" required value={loginStaticCode} onChange={e => setLoginStaticCode(e.target.value)}
+                      className="w-full pl-9 pr-3 py-2 text-sm bg-black/50 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-brand-orange-500 focus:border-brand-orange-500 focus:outline-none placeholder-gray-500 font-medium transition-colors"
+                    />
+                  </div>
 
                   <button 
                     type="submit" disabled={isLoggingIn}

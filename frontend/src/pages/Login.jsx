@@ -5,23 +5,18 @@ import { Coffee, Lock, Mail, UserCircle2, KeyRound } from 'lucide-react';
 
 export default function Login() {
   const navigate = useNavigate();
-  const [role, setRole] = useState('OrderStaff');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [role, setRole] = useState('Chef');
   const [staticCode, setStaticCode] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-
-  const isStaffRole = role === 'Chef' || role === 'BillingStaff';
 
   const handleLogin = (e) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
     try {
-      const response = login({ email, password, role, staticCode });
+      const response = login({ role, staticCode });
       switch (response.role) {
-        case 'OrderStaff':   navigate('/');        break;
         case 'Chef':         navigate('/chef');     break;
         case 'BillingStaff': navigate('/billing');  break;
         default:             navigate('/');
@@ -63,10 +58,9 @@ export default function Login() {
               </div>
               <select
                 value={role}
-                onChange={(e) => { setRole(e.target.value); setStaticCode(''); setEmail(''); setPassword(''); setError(''); }}
+                onChange={(e) => { setRole(e.target.value); setStaticCode(''); setError(''); }}
                 className="w-full pl-10 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white transition-all text-sm appearance-none"
               >
-                <option value="OrderStaff">Order Staff</option>
                 <option value="Chef">Chef</option>
                 <option value="BillingStaff">Billing Staff</option>
               </select>
@@ -78,61 +72,22 @@ export default function Login() {
             </div>
           </div>
 
-          {/* Chef / BillingStaff — auth code only */}
-          {isStaffRole ? (
-            <div className="fade-in">
-              <label className="text-sm font-medium text-gray-700 mb-1 block">Authorization Code</label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                  <KeyRound size={18} />
-                </div>
-                <input
-                  type="password"
-                  placeholder="Enter authorization code"
-                  value={staticCode}
-                  onChange={(e) => setStaticCode(e.target.value)}
-                  required
-                  className="w-full pl-10 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white transition-all text-sm"
-                />
+          <div className="fade-in">
+            <label className="text-sm font-medium text-gray-700 mb-1 block">Authorization Code</label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                <KeyRound size={18} />
               </div>
+              <input
+                type="password"
+                placeholder="Enter authorization code"
+                value={staticCode}
+                onChange={(e) => setStaticCode(e.target.value)}
+                required
+                className="w-full pl-10 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white transition-all text-sm"
+              />
             </div>
-          ) : (
-            /* Order Staff — email + password */
-            <>
-              <div>
-                <label className="text-sm font-medium text-gray-700 mb-1 block">Email Address</label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                    <Mail size={18} />
-                  </div>
-                  <input
-                    type="email"
-                    placeholder="employee@teatraffic.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    className="w-full pl-10 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white transition-all text-sm"
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-gray-700 mb-1 block">Password</label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                    <Lock size={18} />
-                  </div>
-                  <input
-                    type="password"
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    className="w-full pl-10 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white transition-all text-sm"
-                  />
-                </div>
-              </div>
-            </>
-          )}
+          </div>
 
           <button
             type="submit"
